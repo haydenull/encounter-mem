@@ -1,5 +1,6 @@
-import { Button, Kbd, Textarea, useToast } from '@chakra-ui/react'
+import { Button, Textarea, useToast } from '@chakra-ui/react'
 import { useState } from 'react'
+import { api } from '~/utils/api'
 import { fetchSSE } from '~/utils/openai'
 
 const Encounter = () => {
@@ -9,6 +10,10 @@ const Encounter = () => {
     loading: false,
     data: '',
   })
+  const [newVocabId, setNewVocabId] = useState<string>()
+
+  const { mutate: saveNewVocab, isLoading: isSaveNewVocabLoading } =
+    api.vocabulary.createVocabulary.useMutation()
 
   const toast = useToast()
 
@@ -42,6 +47,17 @@ const Encounter = () => {
     setWords([])
     setTranslateResult({ loading: false, data: '' })
   }
+  const onClickSaveToVocab = () => {
+    const newVocab = words.find(({ id }) => id === newVocabId)
+    if (!newVocab) {
+      return toast({ title: 'Please select word', status: 'error' })
+    }
+    const res = saveNewVocab({
+      sentence,
+      word: newVocab.word,
+    })
+    console.log('[faiz:] === res', res)
+  }
 
   return (
     <div>
@@ -68,15 +84,30 @@ const Encounter = () => {
         </div>
       </div>
 
-      <div className="m-2">
-        {words.map(({ word, id }) => (
-          <Kbd key={id} className="m-1">
-            {word}
-          </Kbd>
-        ))}
-      </div>
-
       <div className="m-2">{translateResult.data}</div>
+
+      <div className="m-2">
+        <div>
+          {words.map(({ word, id }) => (
+            <Button
+              key={id}
+              size="sm"
+              className="m-1"
+              onClick={() => setNewVocabId(id)}
+              colorScheme={newVocabId === id ? 'blue' : 'gray'}
+            >
+              {word}
+            </Button>
+          ))}
+        </div>
+        <Button
+          colorScheme="blue"
+          onClick={onClickSaveToVocab}
+          isLoading={isSaveNewVocabLoading}
+        >
+          Save To Vocabulary
+        </Button>
+      </div>
     </div>
   )
 }
