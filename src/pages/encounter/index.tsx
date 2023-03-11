@@ -1,7 +1,8 @@
 import { Button, Textarea, useToast } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { api } from '~/utils/api'
-import { fetchSSE } from '~/utils/openai'
+import { fetchSSE, OpenaiType } from '~/utils/openai'
 
 const Encounter = () => {
   const [sentence, setSentence] = useState('')
@@ -12,8 +13,9 @@ const Encounter = () => {
   })
   const [newVocabId, setNewVocabId] = useState<string>()
 
-  const { mutate: saveNewVocab, isLoading: isSaveNewVocabLoading } =
-    api.vocabulary.createVocabulary.useMutation()
+  const { mutate: saveNewVocab, isLoading: isSaveNewVocabLoading } = api.vocabulary.createVocabulary.useMutation()
+
+  const router = useRouter()
 
   const toast = useToast()
 
@@ -29,6 +31,7 @@ const Encounter = () => {
 
     setTranslateResult({ loading: true, data: '' })
     await fetchSSE(sentence, {
+      openaiType: OpenaiType.translate,
       onMessage(data) {
         setTranslateResult((_prev) => ({
           loading: true,
@@ -61,15 +64,17 @@ const Encounter = () => {
 
   return (
     <div>
-      <Button colorScheme="green" className="m-2">
+      <Button
+        colorScheme="green"
+        className="m-2"
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onClick={() => router.push('/recall')}
+      >
         Recall
       </Button>
 
       <div className="flex m-2">
-        <Textarea
-          value={sentence}
-          onChange={(e) => setSentence(e.target.value)}
-        />
+        <Textarea value={sentence} onChange={(e) => setSentence(e.target.value)} />
         <div className="ml-2">
           <Button className="mb-2" onClick={onClickClear}>
             Clear
@@ -100,11 +105,7 @@ const Encounter = () => {
             </Button>
           ))}
         </div>
-        <Button
-          colorScheme="blue"
-          onClick={onClickSaveToVocab}
-          isLoading={isSaveNewVocabLoading}
-        >
+        <Button colorScheme="blue" onClick={onClickSaveToVocab} isLoading={isSaveNewVocabLoading}>
           Save To Vocabulary
         </Button>
       </div>

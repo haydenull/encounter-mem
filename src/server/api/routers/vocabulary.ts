@@ -53,6 +53,23 @@ export const vocabularyRouter = createTRPCRouter({
       })
     }),
 
+  getVocabulary: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.vocabulary.findMany()
+  }),
+  getSentences: publicProcedure
+    .input(z.object({ vocabularyId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      return ctx.prisma.sentence.findMany({
+        where: {
+          vocabularies: {
+            some: {
+              id: input.vocabularyId,
+            },
+          },
+        },
+      })
+    }),
+
   // createSentence: publicProcedure
   //   .input(
   //     z.object({

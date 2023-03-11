@@ -7,6 +7,7 @@ const config = {
   singleQuote: true,
   jsxSingleQuote: false,
   semi: false,
+  printWidth: 120,
 };
 
 module.exports = config;

@@ -4,11 +4,25 @@ const HEADERS = {
   'Content-Type': 'application/json',
   Authorization: `Bearer ${env.NEXT_PUBLIC_OPENAI_API_KEY}`,
 }
+export enum OpenaiType {
+  translate = 'translate',
+  createSentence = 'createSentence',
+  chat = 'chat',
+}
 const OPENAI_COMMON_MESSAGE = {
-  translate: {
-    systemPrompt:
-      'You are a translation engine that can only translate text and cannot interpret it.',
+  [OpenaiType.translate]: {
+    systemPrompt: 'You are a translation engine that can only translate text and cannot interpret it.',
     assistantPrompt: 'translate the following text into Chinese:',
+  },
+  [OpenaiType.createSentence]: {
+    systemPrompt: 'You are a sentence creation engine that can only create sentences and cannot interpret them.',
+    assistantPrompt:
+      'Create a sentence composed of simple and commonly used words, related to front-end development, programmers or technology, and containing the following words:',
+  },
+  [OpenaiType.chat]: {
+    systemPrompt: 'You are a chat engine that can only chat and cannot interpret it.',
+    assistantPrompt:
+      'You are an English teacher. In the following conversation, please try to include the following words as much as possible and ask me a question after each time you speak. The topic of conversation is related to front-end development, programmers or technology. Also, please point out any errors in my answers.',
   },
 }
 const OPENAI_PARAMS = {
@@ -20,30 +34,36 @@ const OPENAI_PARAMS = {
   presence_penalty: 1,
 }
 
-export const fetchOpenai = async (prompt: string) => {
-  return fetch(`${env.NEXT_PUBLIC_OPENAI_SERVER}/v1/chat/completions`, {
-    method: 'POST',
-    headers: HEADERS,
-    body: JSON.stringify({
-      ...OPENAI_PARAMS,
-      stream: false,
-      messages: [
-        {
-          role: 'system',
-          content: OPENAI_COMMON_MESSAGE.translate.systemPrompt,
-        },
-        {
-          role: 'user',
-          content: OPENAI_COMMON_MESSAGE.translate.assistantPrompt,
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-    }),
-  })
-}
+// export const fetchOpenai = async (
+//   prompt: string | { role: string; content: string }[],
+//   type: OpenaiType = OpenaiType.translate
+// ) => {
+//   const COMMON_MESSAGES = [
+//     {
+//       role: 'system',
+//       content: OPENAI_COMMON_MESSAGE[type].systemPrompt,
+//     },
+//     {
+//       role: 'user',
+//       content: OPENAI_COMMON_MESSAGE[type].assistantPrompt,
+//     },
+//   ]
+//   const messages = Array.isArray(prompt)
+//     ? COMMON_MESSAGES.concat(prompt)
+//     : COMMON_MESSAGES.concat({
+//         role: 'user',
+//         content: prompt,
+//       })
+//   return fetch(`${env.NEXT_PUBLIC_OPENAI_SERVER}/v1/chat/completions`, {
+//     method: 'POST',
+//     headers: HEADERS,
+//     body: JSON.stringify({
+//       ...OPENAI_PARAMS,
+//       stream: false,
+//       messages,
+//     }),
+//   })
+// }
 
 export type StreamData = {
   choices: {
@@ -53,41 +73,42 @@ export type StreamData = {
   }[]
 }
 interface FetchSSEOptions extends RequestInit {
+  openaiType?: OpenaiType
   onMessage: (data: StreamData) => void
-  onError: (error: Error) => void
+  onError?: (error: Error) => void
 }
 export async function fetchSSE(
-  prompt: string,
-  { onMessage, onError }: FetchSSEOptions
+  prompt: string | { role: string; content: string }[],
+  { onMessage, onError, openaiType = OpenaiType.translate }: FetchSSEOptions
 ) {
-  const response = await fetch(
-    `${env.NEXT_PUBLIC_OPENAI_SERVER}/v1/chat/completions`,
+  const COMMON_MESSAGES = [
     {
-      method: 'POST',
-      headers: HEADERS,
-      body: JSON.stringify({
-        ...OPENAI_PARAMS,
-        stream: true,
-        messages: [
-          {
-            role: 'system',
-            content: OPENAI_COMMON_MESSAGE.translate.systemPrompt,
-          },
-          {
-            role: 'user',
-            content: OPENAI_COMMON_MESSAGE.translate.assistantPrompt,
-          },
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-      }),
-    }
-  )
+      role: 'system',
+      content: OPENAI_COMMON_MESSAGE[openaiType].systemPrompt,
+    },
+    {
+      role: 'user',
+      content: OPENAI_COMMON_MESSAGE[openaiType].assistantPrompt,
+    },
+  ]
+  const messages = Array.isArray(prompt)
+    ? COMMON_MESSAGES.concat(prompt)
+    : COMMON_MESSAGES.concat({
+        role: 'user',
+        content: prompt,
+      })
+  const response = await fetch(`${env.NEXT_PUBLIC_OPENAI_SERVER}/v1/chat/completions`, {
+    method: 'POST',
+    headers: HEADERS,
+    body: JSON.stringify({
+      ...OPENAI_PARAMS,
+      stream: true,
+      messages,
+    }),
+  })
   const reader = response.body?.getReader()
   if (!reader) {
-    return onError(new Error('No reader'))
+    return onError?.(new Error('No reader'))
   }
   let buffer = ''
   while (true) {

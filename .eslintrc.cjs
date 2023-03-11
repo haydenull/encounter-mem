@@ -25,7 +25,8 @@ const config = {
         fixStyle: "inline-type-imports",
       },
     ],
-    "@typescript-eslint//no-misused-promises": "off",
+    "@typescript-eslint/no-misused-promises": "off",
+    "@typescript-eslint/no-floating-promises": "off",
   },
 };
 
