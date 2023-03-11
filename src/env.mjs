@@ -29,6 +29,8 @@ const server = z.object({
  */
 const client = z.object({
   // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
+  NEXT_PUBLIC_OPENAI_API_KEY: z.string().min(1),
+  NEXT_PUBLIC_OPENAI_SERVER: z.string().url(),
 });
 
 /**
@@ -45,6 +47,8 @@ const processEnv = {
   DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
   DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+  NEXT_PUBLIC_OPENAI_API_KEY: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  NEXT_PUBLIC_OPENAI_SERVER: process.env.NEXT_PUBLIC_OPENAI_SERVER,
 };
 
 // Don't touch the part below
