@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { List, ListItem, Spinner } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import NavBar from '~/pages/components/NavBar'

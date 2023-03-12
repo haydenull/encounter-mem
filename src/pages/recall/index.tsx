@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { Button, Heading, Spinner } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -10,7 +11,7 @@ const Index = () => {
 
   const currentVocabulary = vocabularies?.[0]
   const { data: sentences, isLoading: getSentencesLoading } = api.vocabulary.getSentences.useQuery(
-    { vocabularyId: currentVocabulary?.id },
+    { vocabularyId: currentVocabulary?.id as number },
     { enabled: !!currentVocabulary }
   )
 
