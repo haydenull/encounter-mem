@@ -49,6 +49,14 @@ To set your profession and interests, you can navigate to the Profile page in en
 
 Please be aware that encounter-mem is still in its early stages, and the database may be subject to change or reset at any time. Use at your own risk.
 
+### Roadmap
+
+- [ ] Improve UI/UX design
+- [ ] Add support for spaced repetition using the Ebbinghaus forgetting curve
+- [ ] Implement user authentication and authorization system
+- [ ] Create a library for storing unprocessed sentences
+- [ ] Provide an API for external software to submit sentences to the database.
+
 ### Contributing
 
 If you'd like to contribute to encounter-mem, please fork the repository and create a pull request with your changes. Be sure to include detailed descriptions of your changes and any relevant tests or documentation updates.
