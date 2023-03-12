@@ -1,28 +1,58 @@
-# Create T3 App
+## Encounter-mem
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Encounter-mem is a tool designed to help users remember new words encountered in everyday life. It allows users to select and save words from sentences they come across, and generates example sentences using OpenAI's GPT-3 API.
 
-## What's next? How do I make an app with this?
+### Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- Select and save words from encountered sentences
+- Generate example sentences using OpenAI's GPT-3 API
+- Engage in a conversation with OpenAI centered around the selected word, with conversation topics limited by user-set profession and interests
+- One-click deployment on Vercel
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+### Demo
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+You can try out an example demo of encounter-mem by visiting [https://encounter.haydenhayden.com](https://encounter.haydenhayden.com).
 
-## Learn More
+### Prerequisites
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+Before deploying encounter-mem, you'll need to complete the following steps:
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+1. Create a [Supabase](https://supabase.io/) account
+2. Create a new database in Supabase and make note of your database URL and API key
+3. Obtain an API key for OpenAI's GPT-3 API
+4. Set up environment variables for your Supabase database credentials, OpenAI API key, and OpenAI server URL in Vercel (you can find instructions on how to do this in the [Vercel documentation](https://vercel.com/docs/environment-variables))
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+### Deployment
 
-## How do I deploy this?
+To deploy encounter-mem to Vercel, click the button below or use this [link](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhayden-hayden%2Fencounter-mem):
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhayden-hayden%2Fencounter-mem)
+
+Once deployed, you can start using encounter-mem to select and save words, generate example sentences, and converse with OpenAI.
+
+### Required Environment Variables
+
+Encounter-mem requires the following environment variables to be set in Vercel:
+
+- `NEXT_PUBLIC_OPENAI_API_KEY`: Your OpenAI API key
+- `NEXT_PUBLIC_OPENAI_SERVER`: The URL for the OpenAI server (`https://api.openai.com`)
+- `DATABASE_URL`: The connection string for your Supabase database
+- `NEXTAUTH_SECRET`: Any value will work for this variable, but it must be set
+- `DISCORD_CLIENT_ID`: Any value will work for this variable, but it must be set
+- `DISCORD_CLIENT_SECRET`: Any value will work for this variable, but it must be set
+
+### Setting Profession and Interests
+
+To set your profession and interests, you can navigate to the Profile page in encounter-mem and update the corresponding fields. This will allow the AI to limit its conversation topics to those related to your profession and interests.
+
+### :warning: Note
+
+Please be aware that encounter-mem is still in its early stages, and the database may be subject to change or reset at any time. Use at your own risk.
+
+### Contributing
+
+If you'd like to contribute to encounter-mem, please fork the repository and create a pull request with your changes. Be sure to include detailed descriptions of your changes and any relevant tests or documentation updates.
+
+### License
+
+Encounter-mem is licensed under the [MIT License](https://opensource.org/licenses/MIT).
