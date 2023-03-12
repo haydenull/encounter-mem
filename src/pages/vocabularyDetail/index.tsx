@@ -1,23 +1,20 @@
 import { Button, Heading, Spinner } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import NavBar from '~/pages/components/NavBar'
 import { api } from '~/utils/api'
 import { fetchSSE, OpenaiType } from '~/utils/openai'
 
 const Index = () => {
   const router = useRouter()
-  const { data: vocabularies, isLoading } = api.vocabulary.getVocabularies.useQuery()
+  const { wordId } = router.query
 
-  const currentVocabulary = vocabularies?.[0]
-  const { data: sentences, isLoading: getSentencesLoading } = api.vocabulary.getSentences.useQuery(
-    { vocabularyId: currentVocabulary?.id },
-    { enabled: !!currentVocabulary }
-  )
+  const { data: vocabulary, isLoading } = api.vocabulary.getVocabulary.useQuery({ id: Number(wordId) })
 
   const [sentenceByAI, setSentenceByAI] = useState({ loading: false, content: '' })
 
   const onClickAICreate = async () => {
-    const word = currentVocabulary?.word
+    const word = vocabulary?.word
     if (!word) return
     setSentenceByAI((_prev) => ({ ..._prev, loading: true }))
     await fetchSSE(word, {
@@ -32,7 +29,7 @@ const Index = () => {
     })
   }
 
-  if (isLoading || getSentencesLoading)
+  if (isLoading)
     return (
       <div className="h-screen flex items-center justify-center">
         <Spinner />
@@ -41,19 +38,20 @@ const Index = () => {
 
   return (
     <div>
-      <Heading>{currentVocabulary?.word}</Heading>
+      <NavBar />
+      <Heading>{vocabulary?.word}</Heading>
       <div>
-        {sentences?.map((sentence) => (
+        {vocabulary?.sentences?.map((sentence) => (
           <p key={sentence.id}>{sentence.content}</p>
         ))}
       </div>
-      <div>
+      <div className="my-2">
         <Button onClick={onClickAICreate} isLoading={sentenceByAI?.loading}>
           AI Create
         </Button>
         <p>{sentenceByAI?.content}</p>
       </div>
-      <Button onClick={() => router.push({ pathname: '/chat', query: { word: currentVocabulary?.word } })}>
+      <Button onClick={() => router.push({ pathname: '/chat', query: { word: vocabulary?.word } })}>
         Chat with AI
       </Button>
     </div>

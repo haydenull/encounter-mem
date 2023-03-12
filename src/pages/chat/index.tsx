@@ -1,23 +1,24 @@
 import { Button, Heading, Input } from '@chakra-ui/react'
+import clsx from 'clsx'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import NavBar from '~/pages/components/NavBar'
 import { fetchSSE, OpenaiType } from '~/utils/openai'
 
 const Index = () => {
   const router = useRouter()
   const { word } = router.query
+  const messageEndRef = useRef<HTMLDivElement>(null)
 
   const [inputValue, setInputValue] = useState<string>('')
 
-  const [chatHistory, setChatHistory] = useState<string[]>([])
+  const [messages, setMessages] = useState<{ role: 'assistant' | 'user'; content: string }[]>([])
 
   const onClickSend = () => {
-    setChatHistory((_prev) => [..._prev, inputValue])
+    setMessages((_prev) => [..._prev, { role: 'user', content: inputValue }])
     setInputValue('')
-  }
-  const onClickChat = () => {
-    const length = chatHistory?.length
-    console.log('[faiz:] === length', length)
+
+    let isFirst = true
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchSSE(
       [
@@ -25,24 +26,26 @@ const Index = () => {
           role: 'user',
           content: word as string,
         },
-      ]
-        .concat(
-          chatHistory.map((item, index) => ({
-            role: index % 2 === 0 ? 'system' : 'user',
-            content: item,
-          }))
-        )
-        .concat({
-          role: 'user',
-          content: inputValue,
-        }),
+      ].concat(messages, {
+        role: 'user',
+        content: inputValue,
+      }),
       {
         openaiType: OpenaiType.chat,
         onMessage: (data) => {
-          setChatHistory((_prev) => {
-            const _newChatHistory = [..._prev]
-            _newChatHistory[length] = (_prev[length] || '') + (data?.choices?.[0]?.delta?.content || '')
-            return _newChatHistory
+          if (isFirst) {
+            isFirst = false
+            return setMessages((_prev) => {
+              return [..._prev, { role: 'assistant', content: data?.choices?.[0]?.delta?.content || '' }]
+            })
+          }
+          setMessages((_prev) => {
+            const lastMessage = _prev[_prev.length - 1]
+            const updatedMessage = {
+              role: 'assistant',
+              content: (lastMessage?.content || '') + (data?.choices?.[0]?.delta?.content || ''),
+            } as const
+            return _prev.slice(0, -1).concat(updatedMessage)
           })
         },
       }
@@ -55,26 +58,45 @@ const Index = () => {
       fetchSSE(word as string, {
         openaiType: OpenaiType.chat,
         onMessage: (data) => {
-          setChatHistory((_prev) => [(_prev?.[0] || '') + (data?.choices?.[0]?.delta?.content || '')])
+          setMessages((_prev) => [
+            {
+              role: 'assistant',
+              content: (_prev?.[0]?.content || '') + (data?.choices?.[0]?.delta?.content || ''),
+            },
+          ])
         },
       })
     }
   }, [word])
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages.length])
 
   return (
-    <div className="min-h-screen pb-9">
-      <Heading>{word}</Heading>
+    <div className="min-h-screen pb-12">
+      <NavBar />
+      <Heading className="flex justify-center">{word}</Heading>
       <div>
-        {chatHistory.map((chat, index) => (
-          <p key={index} className="my-2">
-            {chat}
-          </p>
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={clsx(['my-2 flex px-2', message.role === 'assistant' ? 'justify-start' : 'justify-end'])}
+          >
+            <p
+              className={clsx('rounded shadow-md p-2', message.role === 'assistant' ? 'bg-gray-200' : 'bg-blue-300')}
+              style={{ maxWidth: '80%' }}
+            >
+              {message.content}
+            </p>
+          </div>
         ))}
+        <div ref={messageEndRef}></div>
       </div>
-      <div className="flex fixed bottom-0">
-        <Input value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
-        <Button onClick={onClickSend}>Send</Button>
-        <Button onClick={onClickChat}>Chat</Button>
+      <div className="w-screen flex fixed bottom-0 p-2 justify-between">
+        <Input className="flex-1 flex" value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
+        <Button className="ml-2" onClick={onClickSend}>
+          Send
+        </Button>
       </div>
     </div>
   )

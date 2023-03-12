@@ -5,6 +5,8 @@ import { api } from '~/utils/api'
 import { fetchSSE, OpenaiType } from '~/utils/openai'
 
 const Encounter = () => {
+  const router = useRouter()
+  const toast = useToast()
   const [sentence, setSentence] = useState('')
   const [words, setWords] = useState<{ id: string; word: string }[]>([])
   const [translateResult, setTranslateResult] = useState({
@@ -13,11 +15,11 @@ const Encounter = () => {
   })
   const [newVocabId, setNewVocabId] = useState<string>()
 
-  const { mutate: saveNewVocab, isLoading: isSaveNewVocabLoading } = api.vocabulary.createVocabulary.useMutation()
-
-  const router = useRouter()
-
-  const toast = useToast()
+  const { mutate: saveNewVocab, isLoading: isSaveNewVocabLoading } = api.vocabulary.createVocabulary.useMutation({
+    onSuccess() {
+      toast({ title: 'Save Success', status: 'success' })
+    },
+  })
 
   const onClickTranslate = async () => {
     if (sentence?.trim()?.length === 0) {
@@ -55,30 +57,36 @@ const Encounter = () => {
     if (!newVocab) {
       return toast({ title: 'Please select word', status: 'error' })
     }
-    const res = saveNewVocab({
+    saveNewVocab({
       sentence,
       word: newVocab.word,
     })
-    console.log('[faiz:] === res', res)
   }
 
   return (
     <div>
-      <Button
+      {/* <Button
+        variant="link"
         colorScheme="green"
         className="m-2"
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClick={() => router.push('/recall')}
       >
         Recall
+      </Button> */}
+      <Button variant="link" className="my-2" colorScheme="green" onClick={() => router.push('/vocabularyList')}>
+        List
       </Button>
 
-      <div className="flex m-2">
-        <Textarea value={sentence} onChange={(e) => setSentence(e.target.value)} />
-        <div className="ml-2">
-          <Button className="mb-2" onClick={onClickClear}>
-            Clear
-          </Button>
+      <div className="flex m-2 h-24">
+        <Textarea
+          className="h-full flex-1"
+          height="full"
+          value={sentence}
+          onChange={(e) => setSentence(e.target.value)}
+        />
+        <div className="ml-2 flex flex-col justify-around">
+          <Button onClick={onClickClear}>Clear</Button>
           <Button
             isLoading={translateResult.loading}
             // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -96,7 +104,7 @@ const Encounter = () => {
           {words.map(({ word, id }) => (
             <Button
               key={id}
-              size="sm"
+              size="xs"
               className="m-1"
               onClick={() => setNewVocabId(id)}
               colorScheme={newVocabId === id ? 'blue' : 'gray'}
@@ -105,9 +113,11 @@ const Encounter = () => {
             </Button>
           ))}
         </div>
-        <Button colorScheme="blue" onClick={onClickSaveToVocab} isLoading={isSaveNewVocabLoading}>
-          Save To Vocabulary
-        </Button>
+        {newVocabId && (
+          <Button colorScheme="blue" onClick={onClickSaveToVocab} isLoading={isSaveNewVocabLoading}>
+            Save To Vocabulary
+          </Button>
+        )}
       </div>
     </div>
   )

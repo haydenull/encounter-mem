@@ -53,22 +53,39 @@ export const vocabularyRouter = createTRPCRouter({
       })
     }),
 
-  getVocabulary: publicProcedure.query(({ ctx }) => {
+  getVocabularies: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.vocabulary.findMany()
   }),
-  getSentences: publicProcedure
-    .input(z.object({ vocabularyId: z.number() }))
-    .query(async ({ input, ctx }) => {
-      return ctx.prisma.sentence.findMany({
-        where: {
-          vocabularies: {
-            some: {
-              id: input.vocabularyId,
-            },
+  getVocabulary: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input, ctx }) => {
+    const vocabulary = await ctx.prisma.vocabulary.findUnique({
+      where: {
+        id: input.id,
+      },
+    })
+    if (!vocabulary) return null
+    // get sentences
+    const sentences = await ctx.prisma.sentence.findMany({
+      where: {
+        vocabularies: {
+          some: {
+            id: input.id,
           },
         },
-      })
-    }),
+      },
+    })
+    return { ...vocabulary, sentences }
+  }),
+  getSentences: publicProcedure.input(z.object({ vocabularyId: z.number() })).query(async ({ input, ctx }) => {
+    return ctx.prisma.sentence.findMany({
+      where: {
+        vocabularies: {
+          some: {
+            id: input.vocabularyId,
+          },
+        },
+      },
+    })
+  }),
 
   // createSentence: publicProcedure
   //   .input(
