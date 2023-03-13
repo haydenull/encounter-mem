@@ -65,7 +65,7 @@ const Encounter = () => {
   }
 
   return (
-    <div>
+    <div className="pb-16">
       {/* <Button
         variant="link"
         colorScheme="green"
@@ -75,21 +75,20 @@ const Encounter = () => {
       >
         Recall
       </Button> */}
-      <Button variant="link" className="my-2" colorScheme="green" onClick={() => router.push('/vocabularyList')}>
-        List
-      </Button>
 
-      <div className="flex m-2 h-24">
+      <div className="flex m-2 h-24 pt-3">
         <Textarea
           className="h-full flex-1"
           height="full"
           value={sentence}
           onChange={(e) => setSentence(e.target.value)}
+          placeholder="Input your sentence here."
         />
         <div className="ml-2 flex flex-col justify-around">
           <Button onClick={onClickClear}>Clear</Button>
           <Button
             isLoading={translateResult.loading}
+            loadingText="Translating"
             // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClick={onClickTranslate}
           >
@@ -115,10 +114,34 @@ const Encounter = () => {
           ))}
         </div>
         {newVocabId && (
-          <Button colorScheme="blue" onClick={onClickSaveToVocab} isLoading={isSaveNewVocabLoading}>
+          <Button
+            className="mt-2"
+            colorScheme="green"
+            size="sm"
+            onClick={onClickSaveToVocab}
+            isLoading={isSaveNewVocabLoading}
+          >
             Save To Vocabulary
           </Button>
         )}
+      </div>
+
+      <div className="fixed bottom-0 w-screen justify-center">
+        <div className="p-2 m-2 flex justify-around backdrop-blur-md rounded-md">
+          <Button
+            className="mr-4"
+            style={{ background: 'white' }}
+            colorScheme="green"
+            variant="outline"
+            isDisabled
+            onClick={() => router.push('/vocabularyList')}
+          >
+            Sentence List
+          </Button>
+          <Button colorScheme="green" onClick={() => router.push('/vocabularyList')}>
+            Vocabulary List
+          </Button>
+        </div>
       </div>
     </div>
   )
