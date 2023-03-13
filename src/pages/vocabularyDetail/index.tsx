@@ -30,31 +30,34 @@ const Index = () => {
     })
   }
 
-  if (isLoading)
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <Spinner />
-      </div>
-    )
-
   return (
     <div>
       <NavBar />
-      <Heading>{vocabulary?.word}</Heading>
-      <div>
-        {vocabulary?.sentences?.map((sentence) => (
-          <p key={sentence.id}>{sentence.content}</p>
-        ))}
-      </div>
-      <div className="my-2">
-        <Button onClick={onClickAICreate} isLoading={sentenceByAI?.loading}>
-          AI Create
-        </Button>
-        <p>{sentenceByAI?.content}</p>
-      </div>
-      <Button onClick={() => router.push({ pathname: '/chat', query: { word: vocabulary?.word } })}>
-        Chat with AI
-      </Button>
+      {isLoading ? (
+        <>
+          <div className="h-screen flex items-center justify-center">
+            <Spinner />
+          </div>
+        </>
+      ) : (
+        <div className="px-2">
+          <Heading>{vocabulary?.word}</Heading>
+          <div>
+            {vocabulary?.sentences?.map((sentence) => (
+              <p key={sentence.id}>{sentence.content}</p>
+            ))}
+          </div>
+          <div className="my-2">
+            <Button onClick={onClickAICreate} isLoading={sentenceByAI?.loading} loadingText="Creating">
+              Create Sentence by AI
+            </Button>
+            <p>{sentenceByAI?.content}</p>
+          </div>
+          <Button onClick={() => router.push({ pathname: '/chat', query: { word: vocabulary?.word } })}>
+            Chat with AI
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

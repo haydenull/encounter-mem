@@ -126,8 +126,8 @@ const Encounter = () => {
         )}
       </div>
 
-      <div className="fixed bottom-0 w-screen justify-center">
-        <div className="p-2 m-2 flex justify-around backdrop-blur-md rounded-md">
+      <div className="fixed bottom-0 w-screen flex justify-center">
+        <div className="p-2 m-2 flex backdrop-blur-md rounded-md w-fit">
           <Button
             className="mr-4"
             style={{ background: 'white' }}
