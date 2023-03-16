@@ -15,12 +15,15 @@ datasource db {
 }
 
 model User {
-    id        String       @id @default(cuid())
-    name      String
-    email     String       @unique
-    password  String
-    vocabs    Vocabulary[]
-    sentences Sentence[]
+    id            String       @id @default(cuid())
+    name          String?
+    email         String?      @unique
+    emailVerified DateTime?
+    image         String?
+    accounts      Account[]
+    sessions      Session[]
+    vocabularies  Vocabulary[]
+    sentences     Sentence[]
 }
 
 model Vocabulary {
@@ -28,14 +31,16 @@ model Vocabulary {
     word      String
     meaning   String?
     sentences Sentence[] // 词汇表与句子之间的多对多关系
-    users     User[] // 单词与用户之间的多对多关系
+    userId    String
+    user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Sentence {
     id           Int          @id @default(autoincrement())
     content      String
     vocabularies Vocabulary[] // 句子与词汇表之间的多对多关系
-    users        User[] // 句子与用户之间的多对多关系
+    userId       String
+    user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // model Worl {
@@ -53,47 +58,37 @@ model Example {
     updatedAt DateTime @updatedAt
 }
 
-// // Necessary for Next auth
-// model Account {
-//     id                String  @id @default(cuid())
-//     userId            String
-//     type              String
-//     provider          String
-//     providerAccountId String
-//     refresh_token     String? // @db.Text
-//     access_token      String? // @db.Text
-//     expires_at        Int?
-//     token_type        String?
-//     scope             String?
-//     id_token          String? // @db.Text
-//     session_state     String?
-//     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+// Necessary for Next auth
+model Account {
+    id                String  @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? // @db.Text
+    access_token      String? // @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? // @db.Text
+    session_state     String?
+    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-//     @@unique([provider, providerAccountId])
-// }
+    @@unique([provider, providerAccountId])
+}
 
-// model Session {
-//     id           String   @id @default(cuid())
-//     sessionToken String   @unique
-//     userId       String
-//     expires      DateTime
-//     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-// }
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
-// // model User {
-// //     id            String    @id @default(cuid())
-// //     name          String?
-// //     email         String?   @unique
-// //     emailVerified DateTime?
-// //     image         String?
-// //     accounts      Account[]
-// //     sessions      Session[]
-// // }
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
 
-// model VerificationToken {
-//     identifier String
-//     token      String   @unique
-//     expires    DateTime
-
-//     @@unique([identifier, token])
-// }
+    @@unique([identifier, token])
+}
