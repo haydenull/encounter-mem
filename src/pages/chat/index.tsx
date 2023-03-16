@@ -2,7 +2,7 @@ import { Button, Heading, Input } from '@chakra-ui/react'
 import clsx from 'clsx'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import NavBar from '~/pages/components/NavBar'
+import NavBar from '~/components/NavBar'
 import { fetchSSE, OpenaiType } from '~/utils/openai'
 
 const Index = () => {

@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { Button, Heading, Spinner } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import NavBar from '~/pages/components/NavBar'
+import NavBar from '~/components/NavBar'
 import { api } from '~/utils/api'
 import { fetchSSE, OpenaiType } from '~/utils/openai'
 

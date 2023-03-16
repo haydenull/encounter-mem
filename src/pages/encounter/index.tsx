@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { Button, Textarea, useToast } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -66,15 +65,9 @@ const Encounter = () => {
 
   return (
     <div className="pb-16">
-      {/* <Button
-        variant="link"
-        colorScheme="green"
-        className="m-2"
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onClick={() => router.push('/recall')}
-      >
-        Recall
-      </Button> */}
+      <Button colorScheme="green" className="m-2" onClick={() => router.push('/user')}>
+        User
+      </Button>
 
       <div className="flex m-2 h-24 pt-3">
         <Textarea
