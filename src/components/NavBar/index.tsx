@@ -1,5 +1,5 @@
-import { ChevronLeftIcon } from '@chakra-ui/icons'
-import { Button } from '@chakra-ui/react'
+import { ActionIcon, Button } from '@mantine/core'
+import { IconChevronLeft } from '@tabler/icons-react'
 import { useRouter } from 'next/router'
 
 const NavBar = () => {
@@ -7,7 +7,8 @@ const NavBar = () => {
 
   return (
     <div className="h-10 flex items-center shadow-sm">
-      <Button variant="ghost" leftIcon={<ChevronLeftIcon boxSize={7} />} onClick={() => router.back()}></Button>
+      <Button variant="ghost" leftIcon={<IconChevronLeft size={24} />} onClick={() => router.back()}></Button>
+      <ActionIcon></ActionIcon>
     </div>
   )
 }

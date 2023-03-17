@@ -1,4 +1,4 @@
-import { Button, Heading, Spinner } from '@chakra-ui/react'
+import { Button, Loader, Title } from '@mantine/core'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import NavBar from '~/components/NavBar'
@@ -35,19 +35,19 @@ const Index = () => {
       {isLoading ? (
         <>
           <div className="h-screen flex items-center justify-center">
-            <Spinner />
+            <Loader />
           </div>
         </>
       ) : (
         <div className="px-2">
-          <Heading>{vocabulary?.word}</Heading>
+          <Title>{vocabulary?.word}</Title>
           <div>
             {vocabulary?.sentences?.map((sentence) => (
               <p key={sentence.id}>{sentence.content}</p>
             ))}
           </div>
           <div className="my-2">
-            <Button onClick={onClickAICreate} isLoading={sentenceByAI?.loading} loadingText="Creating">
+            <Button onClick={onClickAICreate} loading={sentenceByAI?.loading}>
               Create Sentence by AI
             </Button>
             <p>{sentenceByAI?.content}</p>

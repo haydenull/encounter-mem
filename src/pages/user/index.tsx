@@ -1,4 +1,4 @@
-import { Button } from '@chakra-ui/react'
+import { Button } from '@mantine/core'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { api } from '~/utils/api'
 

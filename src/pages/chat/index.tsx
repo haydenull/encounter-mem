@@ -1,4 +1,4 @@
-import { Button, Heading, Input } from '@chakra-ui/react'
+import { Button, Input, Title } from '@mantine/core'
 import clsx from 'clsx'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -75,7 +75,7 @@ const Index = () => {
   return (
     <div className="min-h-screen pb-12">
       <NavBar />
-      <Heading className="flex justify-center">{word}</Heading>
+      <Title className="flex justify-center">{word}</Title>
       <div>
         {messages.map((message, index) => (
           <div
