@@ -1,14 +1,16 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-import { Button, Textarea, useToast } from '@chakra-ui/react'
-import { useRouter } from 'next/router'
+import { Box, Button, Textarea } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
+import { IconCheck, IconDeviceFloppy, IconTrash, IconX } from '@tabler/icons-react'
 import { useState } from 'react'
+import NavBar from '~/components/NavBar'
 import { api } from '~/utils/api'
 import { fetchSSE, OpenaiType } from '~/utils/openai'
 
 const Encounter = () => {
-  const router = useRouter()
-  const toast = useToast()
-  const [sentence, setSentence] = useState('')
+  const [sentence, setSentence] = useState({
+    content: '',
+    error: false,
+  })
   const [words, setWords] = useState<{ id: string; word: string }[]>([])
   const [translateResult, setTranslateResult] = useState({
     loading: false,
@@ -18,22 +20,23 @@ const Encounter = () => {
 
   const { mutate: saveNewVocab, isLoading: isSaveNewVocabLoading } = api.vocabulary.createVocabulary.useMutation({
     onSuccess() {
-      toast({ title: 'Save Success', status: 'success' })
+      notifications.show({ title: 'Save Success', message: '', icon: <IconCheck />, color: 'teal' })
     },
   })
 
   const onClickTranslate = async () => {
-    if (sentence?.trim()?.length === 0) {
-      return toast({ title: 'Please input sentence', status: 'error' })
+    const { content } = sentence
+    if (content?.trim()?.length === 0) {
+      return notifications.show({ title: 'Please input sentence', message: '', icon: <IconX />, color: 'red' })
     }
-    const words = sentence.match(/[\w']+|[^\w\s]+/g)?.map((word) => ({
+    const words = content.match(/[\w']+|[^\w\s]+/g)?.map((word) => ({
       id: crypto.randomUUID(),
       word,
     }))
     setWords(words || [])
 
     setTranslateResult({ loading: true, data: '' })
-    await fetchSSE(sentence, {
+    await fetchSSE(content, {
       openaiType: OpenaiType.translate,
       onMessage(data) {
         setTranslateResult((_prev) => ({
@@ -42,106 +45,94 @@ const Encounter = () => {
         }))
       },
       onError(error) {
-        toast({ title: error.message || 'Request Error', status: 'error' })
+        notifications.show({ title: error.message || 'Request Error', message: '', icon: <IconX />, color: 'red' })
         setTranslateResult((_prev) => ({ ..._prev, loading: false }))
       },
     })
     setTranslateResult((_prev) => ({ ..._prev, loading: false }))
   }
   const onClickClear = () => {
-    setSentence('')
+    setSentence({ content: '', error: false })
     setWords([])
     setTranslateResult({ loading: false, data: '' })
   }
   const onClickSaveToVocab = () => {
     const newVocab = words.find(({ id }) => id === newVocabId)
     if (!newVocab) {
-      return toast({ title: 'Please select word', status: 'error' })
+      return notifications.show({ title: 'Please select word', message: '', icon: <IconX />, color: 'red' })
     }
     saveNewVocab({
-      sentence,
+      sentence: sentence.content,
       word: newVocab.word,
     })
   }
 
   return (
     <div className="pb-16">
-      {/* <Button
-        variant="link"
-        colorScheme="green"
-        className="m-2"
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onClick={() => router.push('/recall')}
-      >
-        Recall
-      </Button> */}
+      <NavBar />
 
-      <div className="flex m-2 h-24 pt-3">
+      <div className="flex flex-col m-4">
         <Textarea
           className="h-full flex-1"
-          height="full"
-          value={sentence}
-          onChange={(e) => setSentence(e.target.value)}
+          value={sentence.content}
+          error={sentence.error}
+          onChange={(e) => setSentence({ content: e.target.value, error: false })}
           placeholder="Input your sentence here."
         />
-        <div className="ml-2 flex flex-col justify-around">
-          <Button onClick={onClickClear}>Clear</Button>
-          <Button
-            isLoading={translateResult.loading}
-            loadingText="Translating"
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            onClick={onClickTranslate}
-          >
+        <div className="mt-2 flex justify-center">
+          <Button size="sm" onClick={onClickClear} variant="outline" leftIcon={<IconTrash size="1rem" />}>
+            Clear
+          </Button>
+          <Button loading={translateResult.loading} onClick={onClickTranslate} className="ml-2">
             Translate
           </Button>
         </div>
       </div>
 
-      <div className="m-2">{translateResult.data}</div>
+      {translateResult.data?.length > 0 && (
+        <Box
+          className="m-4"
+          sx={(theme) => ({
+            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+            padding: theme.spacing.xl,
+            cursor: 'pointer',
+          })}
+        >
+          {translateResult.data}
+        </Box>
+      )}
 
-      <div className="m-2">
+      <div className="m-4">
         <div>
           {words.map(({ word, id }) => (
             <Button
+              compact
               key={id}
               size="xs"
+              variant={newVocabId === id ? 'gradient' : 'default'}
+              gradient={{ from: '#ed6ea0', to: '#ec8c69', deg: 35 }}
               className="m-1"
               onClick={() => setNewVocabId(id)}
-              colorScheme={newVocabId === id ? 'blue' : 'gray'}
+              color={newVocabId === id ? 'blue' : 'gray'}
             >
               {word}
             </Button>
           ))}
         </div>
         {newVocabId && (
-          <Button
-            className="mt-2"
-            colorScheme="green"
-            size="sm"
-            onClick={onClickSaveToVocab}
-            isLoading={isSaveNewVocabLoading}
-          >
-            Save To Vocabulary
-          </Button>
+          <div className="flex justify-center my-2">
+            <Button
+              color="red"
+              variant="light"
+              size="sm"
+              onClick={onClickSaveToVocab}
+              loading={isSaveNewVocabLoading}
+              leftIcon={<IconDeviceFloppy size="1rem" />}
+            >
+              Save To Vocabulary
+            </Button>
+          </div>
         )}
-      </div>
-
-      <div className="fixed bottom-0 w-screen flex justify-center">
-        <div className="p-2 m-2 flex backdrop-blur-md rounded-md w-fit">
-          <Button
-            className="mr-4"
-            style={{ background: 'white' }}
-            colorScheme="green"
-            variant="outline"
-            isDisabled
-            onClick={() => router.push('/vocabularyList')}
-          >
-            Sentence List
-          </Button>
-          <Button colorScheme="green" onClick={() => router.push('/vocabularyList')}>
-            Vocabulary List
-          </Button>
-        </div>
       </div>
     </div>
   )

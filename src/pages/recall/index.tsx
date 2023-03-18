@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-import { Button, Heading, Spinner } from '@chakra-ui/react'
+import { Button, Loader, Title } from '@mantine/core'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { api } from '~/utils/api'
@@ -36,20 +35,20 @@ const Index = () => {
   if (isLoading || getSentencesLoading)
     return (
       <div className="h-screen flex items-center justify-center">
-        <Spinner />
+        <Loader />
       </div>
     )
 
   return (
     <div>
-      <Heading>{currentVocabulary?.word}</Heading>
+      <Title>{currentVocabulary?.word}</Title>
       <div>
         {sentences?.map((sentence) => (
           <p key={sentence.id}>{sentence.content}</p>
         ))}
       </div>
       <div>
-        <Button onClick={onClickAICreate} isLoading={sentenceByAI?.loading}>
+        <Button onClick={onClickAICreate} loading={sentenceByAI?.loading}>
           AI Create
         </Button>
         <p>{sentenceByAI?.content}</p>

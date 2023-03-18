@@ -9,6 +9,10 @@ const config = {
       parserOptions: {
         project: "tsconfig.json",
       },
+      rules: {
+        "@typescript-eslint/no-floating-promises": "off",
+        "@typescript-eslint/no-misused-promises": "off",
+      },
     },
   ],
   parser: "@typescript-eslint/parser",
@@ -25,9 +29,9 @@ const config = {
         fixStyle: "inline-type-imports",
       },
     ],
-    "@typescript-eslint/no-misused-promises": "off",
-    "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/no-misused-promises": "off",
   },
 };
 

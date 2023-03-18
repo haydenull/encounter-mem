@@ -1,19 +1,26 @@
-import { Button, Heading, Input } from '@chakra-ui/react'
+import { Box, Button, Input, ScrollArea, Title } from '@mantine/core'
 import clsx from 'clsx'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import NavBar from '~/pages/components/NavBar'
+import NavBar from '~/components/NavBar'
 import { fetchSSE, OpenaiType } from '~/utils/openai'
 
 const Index = () => {
   const router = useRouter()
   const { word } = router.query
-  const messageEndRef = useRef<HTMLDivElement>(null)
+  const viewport = useRef<HTMLDivElement>(null)
 
   const [inputValue, setInputValue] = useState<string>('')
 
   const [messages, setMessages] = useState<{ role: 'assistant' | 'user'; content: string }[]>([])
 
+  // TODO: 防抖
+  const scrollToBottom = () => {
+    viewport.current?.scrollTo({
+      top: viewport.current?.scrollHeight,
+      behavior: 'smooth',
+    })
+  }
   const onClickSend = () => {
     setMessages((_prev) => [..._prev, { role: 'user', content: inputValue }])
     setInputValue('')
@@ -35,9 +42,11 @@ const Index = () => {
         onMessage: (data) => {
           if (isFirst) {
             isFirst = false
-            return setMessages((_prev) => {
+            setMessages((_prev) => {
               return [..._prev, { role: 'assistant', content: data?.choices?.[0]?.delta?.content || '' }]
             })
+            scrollToBottom()
+            return
           }
           setMessages((_prev) => {
             const lastMessage = _prev[_prev.length - 1]
@@ -47,6 +56,7 @@ const Index = () => {
             } as const
             return _prev.slice(0, -1).concat(updatedMessage)
           })
+          scrollToBottom()
         },
       }
     )
@@ -68,31 +78,45 @@ const Index = () => {
       })
     }
   }, [word])
-  useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages.length])
 
   return (
-    <div className="min-h-screen pb-12">
+    <div className="h-screen flex flex-col">
       <NavBar />
-      <Heading className="flex justify-center">{word}</Heading>
-      <div>
+      <Title className="flex justify-center">{word}</Title>
+      <ScrollArea className="flex-1" viewportRef={viewport}>
         {messages.map((message, index) => (
           <div
             key={index}
-            className={clsx(['my-2 flex px-2', message.role === 'assistant' ? 'justify-start' : 'justify-end'])}
+            className={clsx(['my-4 flex px-4', message.role === 'assistant' ? 'justify-start' : 'justify-end'])}
           >
-            <p
-              className={clsx('rounded shadow-md p-2', message.role === 'assistant' ? 'bg-gray-200' : 'bg-blue-300')}
-              style={{ maxWidth: '80%' }}
+            <Box
+              className="shadow-md p-3"
+              sx={(theme) => {
+                const backgroundColor = {
+                  assistant: {
+                    light: theme.colors.gray[0],
+                    dark: theme.colors.dark[6],
+                  },
+                  user: {
+                    light: theme.colors.teal[3],
+                    dark: theme.colors.teal[9],
+                  },
+                }
+                return {
+                  backgroundColor: backgroundColor[message.role][theme.colorScheme],
+                  maxWidth: '80%',
+                  borderRadius: theme.radius.lg,
+                  borderBottomLeftRadius: message.role === 'assistant' ? 0 : theme.radius.lg,
+                  borderBottomRightRadius: message.role === 'user' ? 0 : theme.radius.lg,
+                }
+              }}
             >
               {message.content}
-            </p>
+            </Box>
           </div>
         ))}
-        <div ref={messageEndRef}></div>
-      </div>
-      <div className="w-screen flex fixed bottom-0 p-2 justify-between">
+      </ScrollArea>
+      <div className="w-screen flex p-4 justify-between">
         <Input className="flex-1 flex" value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
         <Button className="ml-2" onClick={onClickSend}>
           Send
