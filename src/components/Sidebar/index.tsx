@@ -38,7 +38,7 @@ function MainLink({ icon, color, label, onClick }: MainLinkProps) {
   )
 }
 
-const Sidebar: React.FC<{}> = () => {
+const Sidebar = () => {
   const router = useRouter()
   const { data: sessionData } = useSession()
   const [opened, { open, close }] = useDisclosure(false)

@@ -1,14 +1,12 @@
 import { Box, Button, Textarea } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { IconCheck, IconDeviceFloppy, IconTrash, IconX } from '@tabler/icons-react'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import NavBar from '~/components/NavBar'
 import { api } from '~/utils/api'
 import { fetchSSE, OpenaiType } from '~/utils/openai'
 
 const Encounter = () => {
-  const router = useRouter()
   const [sentence, setSentence] = useState({
     content: '',
     error: false,

@@ -57,8 +57,9 @@ const Index = () => {
             ))}
           </div>
           <div className="my-2">
-            {sentenceByAI?.sentences?.map((sentence) => (
+            {sentenceByAI?.sentences?.map((sentence, index) => (
               <Box
+                key={index}
                 className="m-4"
                 sx={(theme) => ({
                   backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],

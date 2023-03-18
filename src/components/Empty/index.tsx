@@ -1,5 +1,4 @@
 import { createStyles, rem } from '@mantine/core'
-import React from 'react'
 
 const useStyles = createStyles((theme) => ({
   label: {
@@ -15,7 +14,7 @@ const useStyles = createStyles((theme) => ({
   },
 }))
 
-const Empty: React.FC<{}> = () => {
+const Empty = () => {
   const { classes } = useStyles()
   return (
     <div className="h-full w-full flex items-center justify-center">
