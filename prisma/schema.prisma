@@ -31,16 +31,16 @@ model Vocabulary {
     word      String
     meaning   String?
     sentences Sentence[] // 词汇表与句子之间的多对多关系
-    userId    String
-    user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    String?
+    user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Sentence {
     id           Int          @id @default(autoincrement())
     content      String
     vocabularies Vocabulary[] // 句子与词汇表之间的多对多关系
-    userId       String
-    user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId       String?
+    user         User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // model Worl {
@@ -51,12 +51,6 @@ model Sentence {
 //     owner     User     @relation(fields: [ownerId], references: [id])
 //     ownerId   String
 // }
-
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
 
 // Necessary for Next auth
 model Account {

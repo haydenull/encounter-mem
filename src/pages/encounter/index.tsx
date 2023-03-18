@@ -1,8 +1,9 @@
-import { Button, Textarea } from '@mantine/core'
+import { Box, Button, Textarea } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
-import { IconCheck, IconX } from '@tabler/icons-react'
+import { IconCheck, IconDeviceFloppy, IconTrash, IconX } from '@tabler/icons-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import NavBar from '~/components/NavBar'
 import { api } from '~/utils/api'
 import { fetchSSE, OpenaiType } from '~/utils/openai'
 
@@ -70,11 +71,9 @@ const Encounter = () => {
 
   return (
     <div className="pb-16">
-      <Button className="m-2" onClick={() => router.push('/user')}>
-        User
-      </Button>
+      <NavBar />
 
-      <div className="flex m-2 h-24 pt-3">
+      <div className="flex flex-col m-4">
         <Textarea
           className="h-full flex-1"
           value={sentence.content}
@@ -82,24 +81,38 @@ const Encounter = () => {
           onChange={(e) => setSentence({ content: e.target.value, error: false })}
           placeholder="Input your sentence here."
         />
-        <div className="ml-2 flex flex-col justify-around">
-          <Button size="sm" onClick={onClickClear}>
+        <div className="mt-2 flex justify-center">
+          <Button size="sm" onClick={onClickClear} variant="outline" leftIcon={<IconTrash size="1rem" />}>
             Clear
           </Button>
-          <Button loading={translateResult.loading} onClick={onClickTranslate}>
+          <Button loading={translateResult.loading} onClick={onClickTranslate} className="ml-2">
             Translate
           </Button>
         </div>
       </div>
 
-      <div className="m-2">{translateResult.data}</div>
+      {translateResult.data?.length > 0 && (
+        <Box
+          className="m-4"
+          sx={(theme) => ({
+            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+            padding: theme.spacing.xl,
+            cursor: 'pointer',
+          })}
+        >
+          {translateResult.data}
+        </Box>
+      )}
 
-      <div className="m-2">
+      <div className="m-4">
         <div>
           {words.map(({ word, id }) => (
             <Button
+              compact
               key={id}
               size="xs"
+              variant={newVocabId === id ? 'gradient' : 'default'}
+              gradient={{ from: '#ed6ea0', to: '#ec8c69', deg: 35 }}
               className="m-1"
               onClick={() => setNewVocabId(id)}
               color={newVocabId === id ? 'blue' : 'gray'}
@@ -109,28 +122,19 @@ const Encounter = () => {
           ))}
         </div>
         {newVocabId && (
-          <Button className="mt-2" color="teal" size="sm" onClick={onClickSaveToVocab} loading={isSaveNewVocabLoading}>
-            Save To Vocabulary
-          </Button>
+          <div className="flex justify-center my-2">
+            <Button
+              color="red"
+              variant="light"
+              size="sm"
+              onClick={onClickSaveToVocab}
+              loading={isSaveNewVocabLoading}
+              leftIcon={<IconDeviceFloppy size="1rem" />}
+            >
+              Save To Vocabulary
+            </Button>
+          </div>
         )}
-      </div>
-
-      <div className="fixed bottom-0 w-screen flex justify-center">
-        <div className="p-2 m-2 flex backdrop-blur-md rounded-md w-fit">
-          <Button
-            className="mr-4"
-            style={{ background: 'white' }}
-            color="teal"
-            variant="outline"
-            disabled
-            onClick={() => router.push('/vocabularyList')}
-          >
-            Sentence List
-          </Button>
-          <Button color="teal" onClick={() => router.push('/vocabularyList')}>
-            Vocabulary List
-          </Button>
-        </div>
       </div>
     </div>
   )

@@ -26,7 +26,7 @@ export const vocabularyRouter = createTRPCRouter({
       const sentence = existingSentence
         ? existingSentence
         : await ctx.prisma.sentence.create({
-            data: { content: input.sentence },
+            data: { content: input.sentence, userId: ctx.session?.user?.id },
           })
       // Add the new sentence to the array of sentences.
       if (existingVocabulary) {
@@ -46,6 +46,7 @@ export const vocabularyRouter = createTRPCRouter({
         data: {
           word: input.word,
           meaning: input.meaning,
+          userId: ctx.session?.user?.id,
           sentences: {
             connect: { id: sentence.id },
           },
@@ -54,12 +55,19 @@ export const vocabularyRouter = createTRPCRouter({
     }),
 
   getVocabularies: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.vocabulary.findMany()
+    const userId = ctx.session?.user?.id
+    return ctx.prisma.vocabulary.findMany({
+      where: {
+        userId,
+      },
+    })
   }),
   getVocabulary: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input, ctx }) => {
-    const vocabulary = await ctx.prisma.vocabulary.findUnique({
+    const userId = ctx.session?.user?.id
+    const vocabulary = await ctx.prisma.vocabulary.findFirst({
       where: {
         id: input.id,
+        userId,
       },
     })
     if (!vocabulary) return null
@@ -69,6 +77,7 @@ export const vocabularyRouter = createTRPCRouter({
         vocabularies: {
           some: {
             id: input.id,
+            userId,
           },
         },
       },
@@ -76,11 +85,13 @@ export const vocabularyRouter = createTRPCRouter({
     return { ...vocabulary, sentences }
   }),
   getSentences: publicProcedure.input(z.object({ vocabularyId: z.number() })).query(async ({ input, ctx }) => {
+    const userId = ctx.session?.user?.id
     return ctx.prisma.sentence.findMany({
       where: {
         vocabularies: {
           some: {
             id: input.vocabularyId,
+            userId,
           },
         },
       },

@@ -1,14 +1,16 @@
-import { ActionIcon, Button } from '@mantine/core'
-import { IconChevronLeft } from '@tabler/icons-react'
+import { Title } from '@mantine/core'
 import { useRouter } from 'next/router'
+import Sidebar from '../Sidebar'
 
 const NavBar = () => {
   const router = useRouter()
 
   return (
     <div className="h-10 flex items-center shadow-sm">
-      <Button variant="ghost" leftIcon={<IconChevronLeft size={24} />} onClick={() => router.back()}></Button>
-      <ActionIcon></ActionIcon>
+      <Sidebar />
+      <Title className="cursor-pointer" order={5} onClick={() => router.push('/')}>
+        Encounter Mem
+      </Title>
     </div>
   )
 }
