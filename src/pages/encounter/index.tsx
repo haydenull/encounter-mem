@@ -17,6 +17,7 @@ const Encounter = () => {
     data: '',
   })
   const [newVocabId, setNewVocabId] = useState<string>()
+  const { data: userInfo } = api.vocabulary.getUserInfo.useQuery()
 
   const { mutate: saveNewVocab, isLoading: isSaveNewVocabLoading } = api.vocabulary.createVocabulary.useMutation({
     onSuccess() {
@@ -37,6 +38,7 @@ const Encounter = () => {
 
     setTranslateResult({ loading: true, data: '' })
     await fetchSSE(content, {
+      userInfo,
       openaiType: OpenaiType.translate,
       onMessage(data) {
         setTranslateResult((_prev) => ({

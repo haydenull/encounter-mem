@@ -1,9 +1,22 @@
-import { ActionIcon, Avatar, Button, Drawer, Group, Text, ThemeIcon, UnstyledButton } from '@mantine/core'
+import {
+  ActionIcon,
+  Avatar,
+  Button,
+  Drawer,
+  Group,
+  Modal,
+  Text,
+  TextInput,
+  ThemeIcon,
+  UnstyledButton,
+} from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconMenu2, IconVocabulary } from '@tabler/icons-react'
+import { notifications } from '@mantine/notifications'
+import { IconEdit, IconMenu2, IconVocabulary } from '@tabler/icons-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useState } from 'react'
+import { api } from '~/utils/api'
 
 interface MainLinkProps {
   icon: React.ReactNode
@@ -42,19 +55,57 @@ const Sidebar = () => {
   const router = useRouter()
   const { data: sessionData } = useSession()
   const [opened, { open, close }] = useDisclosure(false)
+  const [topicModal, { open: openTopicModal, close: closeTopicModal }] = useDisclosure(false)
+
+  const { data: userInfo, refetch: refetchUserInfo } = api.vocabulary.getUserInfo.useQuery()
+  const [topicValue, setTopicValue] = useState(userInfo?.topic || '')
+
+  const { mutateAsync: updateUserTopic, isLoading: updating } = api.vocabulary.updateUserTopic.useMutation()
+
+  const onClickTopicSave = async () => {
+    await updateUserTopic({ topic: topicValue })
+    notifications.show({ title: 'Topic updated', message: 'Your topic has been updated', color: 'green' })
+    refetchUserInfo()
+    closeTopicModal()
+  }
+
   return (
     <>
+      <Modal opened={topicModal} onClose={closeTopicModal} title="Set your topic">
+        <TextInput label="Topic" value={topicValue} onChange={(e) => setTopicValue(e.target.value)} />
+        <div className="mt-2 flex justify-end">
+          <Button loading={updating} onClick={onClickTopicSave}>
+            Save
+          </Button>
+        </div>
+      </Modal>
       <Drawer opened={opened} onClose={close} withCloseButton={false}>
         <div className="h-screen flex flex-col justify-between -my-4 py-4">
           <div>
             <Avatar radius="xl" color={sessionData ? 'teal' : 'gray'} size="lg">
-              {sessionData ? sessionData?.user?.email?.split('@')?.[0]?.[0] : null}
+              {sessionData ? sessionData?.user?.email?.split('@')?.[0]?.[0]?.toUpperCase() : null}
             </Avatar>
-            <p className="text-gray-400">{sessionData && <span>{sessionData.user?.email}</span>}</p>
+            <div className="text-gray-400">
+              {sessionData && <p className="my-1 ml-3 flex items-center">{sessionData.user?.email}</p>}
+              {sessionData && (
+                <p className="my-1 ml-3 flex items-center text-ellipsis overflow-hidden w-full">
+                  {userInfo?.topic}
+                  <ActionIcon
+                    color="teal"
+                    onClick={() => {
+                      setTopicValue(userInfo?.topic || '')
+                      openTopicModal()
+                    }}
+                  >
+                    <IconEdit size="1rem" />
+                  </ActionIcon>
+                </p>
+              )}
+            </div>
             <MainLink
               icon={<IconVocabulary size="1rem" />}
               color="teal"
-              label="Vocabulart List"
+              label="Vocabulary List"
               onClick={() => router.push('/vocabularyList')}
             />
             {/* <MainLink icon={<IconNotebook size="1rem" />} color="blue" label="Sentence List" /> */}

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { createTRPCRouter, publicProcedure } from '~/server/api/trpc'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc'
 
 export const vocabularyRouter = createTRPCRouter({
   createVocabulary: publicProcedure
@@ -14,7 +14,9 @@ export const vocabularyRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const existingVocabulary = await ctx.prisma.vocabulary.findFirst({
         where: {
-          word: input.word,
+          word: {
+            equals: input.word,
+          },
         },
       })
       const existingSentence = await ctx.prisma.sentence.findFirst({
@@ -94,6 +96,23 @@ export const vocabularyRouter = createTRPCRouter({
             userId,
           },
         },
+      },
+    })
+  }),
+  getUserInfo: publicProcedure.query(async ({ input, ctx }) => {
+    return ctx.prisma.user.findFirst({
+      where: {
+        id: ctx.session?.user?.id,
+      },
+    })
+  }),
+  updateUserTopic: protectedProcedure.input(z.object({ topic: z.string() })).mutation(async ({ input, ctx }) => {
+    return ctx.prisma.user.update({
+      where: {
+        id: ctx.session?.user?.id,
+      },
+      data: {
+        topic: input.topic,
       },
     })
   }),
