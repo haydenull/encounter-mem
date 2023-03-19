@@ -79,7 +79,7 @@ const Sidebar = () => {
           </Button>
         </div>
       </Modal>
-      <Drawer opened={opened} onClose={close} withCloseButton={false}>
+      <Drawer opened={opened} onClose={close} withCloseButton={false} size="xs">
         <div className="h-screen flex flex-col justify-between -my-4 py-4">
           <div>
             <Avatar radius="xl" color={sessionData ? 'teal' : 'gray'} size="lg">
@@ -102,13 +102,15 @@ const Sidebar = () => {
                 </p>
               )}
             </div>
-            <MainLink
-              icon={<IconVocabulary size="1rem" />}
-              color="teal"
-              label="Vocabulary List"
-              onClick={() => router.push('/vocabularyList')}
-            />
-            {/* <MainLink icon={<IconNotebook size="1rem" />} color="blue" label="Sentence List" /> */}
+            <div className="mt-8">
+              <MainLink
+                icon={<IconVocabulary size="1rem" />}
+                color="teal"
+                label="Vocabulary List"
+                onClick={() => router.push('/vocabularyList')}
+              />
+              {/* <MainLink icon={<IconNotebook size="1rem" />} color="blue" label="Sentence List" /> */}
+            </div>
           </div>
           <Button onClick={sessionData ? () => void signOut() : () => void signIn()}>
             {sessionData ? 'Sign out' : 'Sign in'}

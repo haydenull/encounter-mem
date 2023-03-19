@@ -81,7 +81,7 @@ const Index = () => {
         },
       })
     }
-  }, [word])
+  }, [word, userInfo])
 
   return (
     <div className="h-screen flex flex-col">
