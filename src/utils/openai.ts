@@ -1,4 +1,4 @@
-import { User } from '@prisma/client'
+import type { User } from '@prisma/client'
 import { env } from '~/env.mjs'
 
 const HEADERS = {
@@ -111,9 +111,9 @@ export async function fetchSSE(
   const messages = Array.isArray(prompt)
     ? COMMON_MESSAGES.concat(prompt)
     : COMMON_MESSAGES.concat({
-        role: 'user',
-        content: prompt,
-      })
+      role: 'user',
+      content: prompt,
+    })
   const response = await fetch(`${env.NEXT_PUBLIC_OPENAI_SERVER}/v1/chat/completions`, {
     method: 'POST',
     headers: HEADERS,
@@ -140,7 +140,7 @@ export async function fetchSSE(
         try {
           const json = JSON.parse(_line) as StreamData
           onMessage(json)
-        } catch (err) {}
+        } catch (err) { }
       })
     }
   }
