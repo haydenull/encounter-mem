@@ -10,6 +10,7 @@ const Index = () => {
   const router = useRouter()
   const { wordId } = router.query
 
+  const { data: userInfo } = api.vocabulary.getUserInfo.useQuery()
   const { data: vocabulary, isLoading } = api.vocabulary.getVocabulary.useQuery({ id: Number(wordId) })
 
   const [sentenceByAI, setSentenceByAI] = useState<{
@@ -24,6 +25,7 @@ const Index = () => {
     let isFirst = true
     await fetchSSE(word, {
       openaiType: OpenaiType.createSentence,
+      userInfo,
       onMessage(data) {
         const newContent = data?.choices?.[0]?.delta?.content || ''
         if (isFirst) {

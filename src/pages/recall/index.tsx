@@ -7,6 +7,7 @@ import { fetchSSE, OpenaiType } from '~/utils/openai'
 const Index = () => {
   const router = useRouter()
   const { data: vocabularies, isLoading } = api.vocabulary.getVocabularies.useQuery()
+  const { data: userInfo } = api.vocabulary.getUserInfo.useQuery()
 
   const currentVocabulary = vocabularies?.[0]
   const { data: sentences, isLoading: getSentencesLoading } = api.vocabulary.getSentences.useQuery(
@@ -22,6 +23,7 @@ const Index = () => {
     setSentenceByAI((_prev) => ({ ..._prev, loading: true }))
     await fetchSSE(word, {
       openaiType: OpenaiType.createSentence,
+      userInfo,
       onMessage(data) {
         setSentenceByAI((_prev) => ({
           ..._prev,

@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import NavBar from '~/components/NavBar'
+import { api } from '~/utils/api'
 import { fetchSSE, OpenaiType } from '~/utils/openai'
 
 const Index = () => {
@@ -11,6 +12,7 @@ const Index = () => {
   const viewport = useRef<HTMLDivElement>(null)
 
   const [inputValue, setInputValue] = useState<string>('')
+  const { data: userInfo } = api.vocabulary.getUserInfo.useQuery()
 
   const [messages, setMessages] = useState<{ role: 'assistant' | 'user'; content: string }[]>([])
 
@@ -39,6 +41,7 @@ const Index = () => {
       }),
       {
         openaiType: OpenaiType.chat,
+        userInfo,
         onMessage: (data) => {
           if (isFirst) {
             isFirst = false
@@ -67,6 +70,7 @@ const Index = () => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       fetchSSE(word as string, {
         openaiType: OpenaiType.chat,
+        userInfo,
         onMessage: (data) => {
           setMessages((_prev) => [
             {

@@ -1,3 +1,4 @@
+import { User } from '@prisma/client'
 import { env } from '~/env.mjs'
 
 const HEADERS = {
@@ -9,22 +10,22 @@ export enum OpenaiType {
   createSentence = 'createSentence',
   chat = 'chat',
 }
-const OPENAI_COMMON_MESSAGE = {
-  [OpenaiType.translate]: {
-    systemPrompt: 'You are a translation engine that can only translate text and cannot interpret it.',
-    assistantPrompt: 'translate the following text into Chinese:',
-  },
-  [OpenaiType.createSentence]: {
-    systemPrompt: 'You are a sentence creation engine that can only create sentences and cannot interpret them.',
-    assistantPrompt:
-      'Create a sentence composed of simple and commonly used words, related to front-end development, programmers or technology, and containing the following words:',
-  },
-  [OpenaiType.chat]: {
-    systemPrompt: 'You are a chat engine that can only chat and cannot interpret it.',
-    assistantPrompt:
-      'You are an English teacher. In the following conversation, please try to include the following words as much as possible and ask me a question after each time you speak. The topic of conversation is related to front-end development, programmers or technology. Also, please point out any errors in my answers.',
-  },
-}
+// const OPENAI_COMMON_MESSAGE = {
+//   [OpenaiType.translate]: {
+//     systemPrompt: 'You are a translation engine that can only translate text and cannot interpret it.',
+//     assistantPrompt: 'translate the following text into Chinese:',
+//   },
+//   [OpenaiType.createSentence]: {
+//     systemPrompt: 'You are a sentence creation engine that can only create sentences and cannot interpret them.',
+//     assistantPrompt:
+//       'Create a sentence composed of simple and commonly used words, related to front-end development, programmers or technology, and containing the following words:',
+//   },
+//   [OpenaiType.chat]: {
+//     systemPrompt: 'You are a chat engine that can only chat and cannot interpret it.',
+//     assistantPrompt:
+//       'You are an English teacher. In the following conversation, please try to include the following words as much as possible and ask me a question after each time you speak. The topic of conversation is related to front-end development, programmers or technology. Also, please point out any errors in my answers.',
+//   },
+// }
 const OPENAI_PARAMS = {
   model: 'gpt-3.5-turbo',
   temperature: 0,
@@ -76,11 +77,27 @@ interface FetchSSEOptions extends RequestInit {
   openaiType?: OpenaiType
   onMessage: (data: StreamData) => void
   onError?: (error: Error) => void
+  userInfo?: User | null
 }
 export async function fetchSSE(
   prompt: string | { role: string; content: string }[],
-  { onMessage, onError, openaiType = OpenaiType.translate }: FetchSSEOptions
+  { onMessage, onError, openaiType = OpenaiType.translate, userInfo }: FetchSSEOptions
 ) {
+  const topic = userInfo?.topic || 'food, travel, music'
+  const OPENAI_COMMON_MESSAGE = {
+    [OpenaiType.translate]: {
+      systemPrompt: 'You are a translation engine that can only translate text and cannot interpret it.',
+      assistantPrompt: 'translate the following text into Chinese:',
+    },
+    [OpenaiType.createSentence]: {
+      systemPrompt: 'You are a sentence creation engine that can only create sentences and cannot interpret them.',
+      assistantPrompt: `Create a sentence composed of simple and commonly used words, related to ${topic}, and containing the following words:`,
+    },
+    [OpenaiType.chat]: {
+      systemPrompt: 'You are a chat engine that can only chat and cannot interpret it.',
+      assistantPrompt: `You are an English teacher. In the following conversation, please try to include the following words as much as possible and ask me a question after each time you speak. The topic of conversation is related to ${topic}. Also, please point out any errors in my answers.`,
+    },
+  }
   const COMMON_MESSAGES = [
     {
       role: 'system',
