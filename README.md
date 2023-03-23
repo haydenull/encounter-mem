@@ -9,10 +9,6 @@ Encounter-mem is a tool designed to help users remember new words encountered in
 - Engage in a conversation with OpenAI centered around the selected word, with conversation topics limited by user-set profession and interests
 - One-click deployment on Vercel
 
-### Demo
-
-You can try out an example demo of encounter-mem by visiting [https://encounter.haydenhayden.com](https://encounter.haydenhayden.com).
-
 ### Prerequisites
 
 Before deploying encounter-mem, you'll need to complete the following steps:
