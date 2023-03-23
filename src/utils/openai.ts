@@ -111,15 +111,16 @@ export async function fetchSSE(
   const messages = Array.isArray(prompt)
     ? COMMON_MESSAGES.concat(prompt)
     : COMMON_MESSAGES.concat({
-      role: 'user',
-      content: prompt,
-    })
-  const response = await fetch(`${env.NEXT_PUBLIC_OPENAI_SERVER}/v1/chat/completions`, {
+        role: 'user',
+        content: prompt,
+      })
+  // const response = await fetch(`${env.NEXT_PUBLIC_OPENAI_SERVER}/v1/chat/completions`, {
+  const response = await fetch('/api/openai', {
     method: 'POST',
-    headers: HEADERS,
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      ...OPENAI_PARAMS,
-      stream: true,
+      // ...OPENAI_PARAMS,
+      // stream: true,
       messages,
     }),
   })
@@ -140,7 +141,7 @@ export async function fetchSSE(
         try {
           const json = JSON.parse(_line) as StreamData
           onMessage(json)
-        } catch (err) { }
+        } catch (err) {}
       })
     }
   }
