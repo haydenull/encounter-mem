@@ -10,7 +10,7 @@ const Index = () => {
   const { data: vocabularies, isLoading } = api.vocabulary.getVocabularies.useQuery()
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-full flex flex-col">
       <NavBar />
       <div className="flex flex-1">
         <LoadingOverlay visible={isLoading} />

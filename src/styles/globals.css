@@ -1,3 +1,15 @@
 /* @tailwind base; */
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+  --negative-safe-area-inset-bottom: calc(-1 * env(safe-area-inset-bottom));
+}
+html, body {
+  height: 100%;
+}
+body {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}

@@ -47,7 +47,7 @@ const Index = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-full flex flex-col">
       <NavBar />
       <div className="flex-1 relative">
         <LoadingOverlay visible={isLoading} />
