@@ -20,17 +20,21 @@ export async function OpenAIStream(payload: any) {
       function onParse(event: ParsedEvent | ReconnectInterval) {
         if (event.type === 'event') {
           const data = event.data
-          if (data === '[DONE]') {
-            controller.close()
-            return
-          }
+          // if (data === '[DONE]') {
+          //   controller.close()
+          //   return
+          // }
           try {
             const json = JSON.parse(data)
-            const text = json.choices[0].text
-            if (counter < 2 && (text.match(/\n/) || []).length) {
+            // const text = json.choices[0].text
+            // if (counter < 2 && (text.match(/\n/) || []).length) {
+            //   return
+            // }
+            if (json?.choices?.[0]?.finish_reason === 'stop') {
+              controller.close()
               return
             }
-            const queue = encoder.encode(text)
+            const queue = encoder.encode(data)
             controller.enqueue(queue)
             counter++
           } catch (e) {
