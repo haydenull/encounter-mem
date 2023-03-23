@@ -14,13 +14,13 @@ const OPENAI_PARAMS = {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  const { prompt } = (await req.json()) as {
-    prompt?: string
+  const { messages } = (await req.json()) as {
+    messages?: any[]
   }
 
   const payload = {
     ...OPENAI_PARAMS,
-    prompt: prompt,
+    messages: messages,
   }
 
   const stream = await OpenAIStream(payload)
