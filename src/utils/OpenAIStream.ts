@@ -1,11 +1,11 @@
 import { env } from '~/env.mjs'
-import { RequestPayload } from '~/pages/api/openai'
+import type { RequestPayload } from '~/pages/api/openai'
 
 export async function OpenAIStream(payload: RequestPayload) {
-  const encoder = new TextEncoder()
-  const decoder = new TextDecoder()
+  // const encoder = new TextEncoder()
+  // const decoder = new TextDecoder()
 
-  let counter = 0
+  // let counter = 0
 
   const res = await fetch(`${env.OPENAI_API_BASE_URL}/v1/chat/completions`, {
     headers: {
@@ -15,19 +15,17 @@ export async function OpenAIStream(payload: RequestPayload) {
     method: 'POST',
     body: JSON.stringify(payload),
   })
-  console.log('[faiz:] === res', res.body)
-  // return res.body
+  return res.body
 
-  const customStream = new ReadableStream({
-    async start(controller) {
-      for await (const chunk of res.body as any) {
-        controller.enqueue(chunk)
-      }
-      controller.close()
-    },
-  })
-
-  return customStream
+  // const customStream = new ReadableStream({
+  //   async start(controller) {
+  //     for await (const chunk of res.body as any) {
+  //       controller.enqueue(chunk)
+  //     }
+  //     controller.close()
+  //   },
+  // })
+  // return customStream
 
   // const stream = new ReadableStream({
   //   async start(controller) {

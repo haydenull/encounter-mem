@@ -11,6 +11,7 @@ const payload = {
   top_p: 1,
   frequency_penalty: 1,
   presence_penalty: 1,
+  stream: true,
 }
 export type RequestPayload = typeof payload & {
   messages?: {
@@ -20,8 +21,6 @@ export type RequestPayload = typeof payload & {
 }
 const handler = async (req: Request): Promise<Response> => {
   const { messages } = (await req.json()) as RequestPayload
-
-  console.log('[faiz:] === handler', messages)
 
   const stream = await OpenAIStream({
     ...payload,

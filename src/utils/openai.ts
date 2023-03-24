@@ -66,7 +66,7 @@ const OPENAI_PARAMS = {
 
 export type StreamData = {
   choices: {
-    message: { content?: string; role?: string }
+    delta: { content?: string; role?: string }
     index: number
     finish_reason: null | 'stop'
   }[]
@@ -132,14 +132,11 @@ export async function fetchSSE(
     if (value) {
       buffer += new TextDecoder().decode(value)
       const lines = buffer.split('\n')
-      console.log('[faiz:] === lines', lines)
       buffer = lines.pop() || ''
       lines.forEach((line) => {
-        console.log('[faiz:] === line', line)
         const _line = line?.replace(/^data: /, '')
         try {
           const json = JSON.parse(_line) as StreamData
-          console.log('[faiz:] === json', json)
           onMessage(json)
         } catch (err) {}
       })
