@@ -16,6 +16,13 @@ const Encounter = () => {
     loading: false,
     data: '',
   })
+  const [wordDefinition, setWordDefinition] = useState<{
+    content: string
+    loading: boolean
+  }>({
+    content: '',
+    loading: false,
+  })
   const [newVocabId, setNewVocabId] = useState<string>()
   const { data: userInfo } = api.vocabulary.getUserInfo.useQuery()
 
@@ -57,6 +64,42 @@ const Encounter = () => {
     setSentence({ content: '', error: false })
     setWords([])
     setTranslateResult({ loading: false, data: '' })
+  }
+  const onClickWord = (wordId: string) => {
+    if (wordDefinition?.loading) return
+    setNewVocabId(wordId)
+    const word = words.find(({ id }) => id === wordId)?.word ?? ''
+    const prompt = [
+      {
+        role: 'assistant',
+        content: translateResult?.data,
+      } as const,
+      {
+        role: 'user',
+        content: `请给出句子中的单词 ${word} 的原始形态（如果有）、单词的语种、对应的音标（如果有）、所有含义（含词性）、双语示例，至少三条例句，请严格按照下面格式给到翻译结果：
+        <原始文本>
+        [<语种>] · / <单词音标>
+        [<词性缩写>] <中文含义>]
+        例句：
+        <序号><例句>(例句翻译)`,
+      } as const,
+    ]
+    setWordDefinition({ content: '', loading: true })
+    fetchSSE(prompt, {
+      openaiType: OpenaiType.translate,
+      userInfo,
+      onMessage(data) {
+        setWordDefinition((_prev) => ({
+          content: _prev?.content + (data?.choices?.[0]?.delta?.content || ''),
+          loading: true,
+        }))
+      },
+      onSuccess: () => setWordDefinition((_prev) => ({ ..._prev, loading: false })),
+      onError: (error) => {
+        notifications.show({ title: error.message || 'Request Error', message: '', icon: <IconX />, color: 'red' })
+        setWordDefinition((_prev) => ({ ..._prev, loading: false }))
+      },
+    })
   }
   const onClickSaveToVocab = () => {
     const newVocab = words.find(({ id }) => id === newVocabId)
@@ -104,6 +147,19 @@ const Encounter = () => {
         </Box>
       )}
 
+      {wordDefinition?.content && (
+        <Box
+          className="m-4 whitespace-pre-line"
+          sx={(theme) => ({
+            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+            padding: theme.spacing.xl,
+            cursor: 'pointer',
+          })}
+        >
+          {wordDefinition.content}
+        </Box>
+      )}
+
       <div className="m-4">
         <div>
           {words.map(({ word, id }) => (
@@ -114,7 +170,7 @@ const Encounter = () => {
               variant={newVocabId === id ? 'gradient' : 'default'}
               gradient={{ from: '#ed6ea0', to: '#ec8c69', deg: 35 }}
               className="m-1"
-              onClick={() => setNewVocabId(id)}
+              onClick={() => onClickWord(id)}
               color={newVocabId === id ? 'blue' : 'gray'}
             >
               {word}

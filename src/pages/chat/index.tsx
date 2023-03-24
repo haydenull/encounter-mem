@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import NavBar from '~/components/NavBar'
 import { api } from '~/utils/api'
-import { fetchSSE, OpenaiType } from '~/utils/openai'
+import { fetchSSE, OpenaiType, type Message } from '~/utils/openai'
 
 const Index = () => {
   const router = useRouter()
@@ -14,7 +14,7 @@ const Index = () => {
   const [inputValue, setInputValue] = useState<string>('')
   const { data: userInfo } = api.vocabulary.getUserInfo.useQuery()
 
-  const [messages, setMessages] = useState<{ role: 'assistant' | 'user'; content: string }[]>([])
+  const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([])
 
   // TODO: 防抖
   const scrollToBottom = () => {
@@ -28,14 +28,16 @@ const Index = () => {
     setInputValue('')
 
     let isFirst = true
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    if (!word) return
     fetchSSE(
-      [
-        {
-          role: 'user',
-          content: word as string,
-        },
-      ].concat(messages, {
+      (
+        [
+          {
+            role: 'user',
+            content: word as string,
+          } as const,
+        ] as Message[]
+      ).concat(messages, {
         role: 'user',
         content: inputValue,
       }),
@@ -94,7 +96,7 @@ const Index = () => {
             className={clsx(['my-4 flex px-4', message.role === 'assistant' ? 'justify-start' : 'justify-end'])}
           >
             <Box
-              className="shadow-md p-3"
+              className="shadow-md p-3 whitespace-pre-line"
               sx={(theme) => {
                 const backgroundColor = {
                   assistant: {

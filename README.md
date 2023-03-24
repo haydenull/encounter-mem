@@ -9,6 +9,10 @@ Encounter-mem is a tool designed to help users remember new words encountered in
 - Engage in a conversation with OpenAI centered around the selected word, with conversation topics limited by user-set profession and interests
 - One-click deployment on Vercel
 
+### Demo
+
+You can try out an example demo of encounter-mem by visiting [https://encounter.haydenhayden.com](https://encounter.haydenhayden.com).
+
 ### Prerequisites
 
 Before deploying encounter-mem, you'll need to complete the following steps:
@@ -30,12 +34,12 @@ Once deployed, you can start using encounter-mem to select and save words, gener
 
 Encounter-mem requires the following environment variables to be set in Vercel:
 
-- `NEXT_PUBLIC_OPENAI_API_KEY`: Your OpenAI API key
-- `NEXT_PUBLIC_OPENAI_SERVER`: The URL for the OpenAI server (`https://api.openai.com`)
+- `OPENAI_API_KEY`: Your OpenAI API key
+- `OPENAI_API_BASE_URL`: The URL for the OpenAI server (`https://api.openai.com`)
 - `DATABASE_URL`: The connection string for your Supabase database
 - `NEXTAUTH_SECRET`: Any value will work for this variable, but it must be set
-- `DISCORD_CLIENT_ID`: Any value will work for this variable, but it must be set
-- `DISCORD_CLIENT_SECRET`: Any value will work for this variable, but it must be set
+- `EMAIL_FROM`: The email address that will be used to send emails from the app
+- `EMAIL_SERVER`: The SMTP server that will be used to send emails from the app
 
 ### Setting Profession and Interests
 

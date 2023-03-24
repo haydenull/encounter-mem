@@ -74,7 +74,7 @@ const Sidebar = () => {
   return (
     <>
       <Drawer opened={opened} onClose={close} withCloseButton={false} size="xs">
-        <div className="flex flex-col justify-between -my-4 py-4" style={{ height: viewportHeight + 'px' }}>
+        <div className="flex flex-col justify-between -my-4 py-4" style={{ height: `${viewportHeight}px` }}>
           <div>
             <Avatar radius="xl" color={sessionData ? 'teal' : 'gray'} size="lg">
               {sessionData ? sessionData?.user?.email?.split('@')?.[0]?.[0]?.toUpperCase() : null}

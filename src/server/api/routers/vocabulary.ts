@@ -99,7 +99,7 @@ export const vocabularyRouter = createTRPCRouter({
       },
     })
   }),
-  getUserInfo: publicProcedure.query(async ({ input, ctx }) => {
+  getUserInfo: publicProcedure.query(async ({ ctx }) => {
     return ctx.prisma.user.findFirst({
       where: {
         id: ctx.session?.user?.id,
