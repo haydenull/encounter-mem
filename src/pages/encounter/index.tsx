@@ -43,7 +43,7 @@ const Encounter = () => {
       onMessage(data) {
         setTranslateResult((_prev) => ({
           loading: true,
-          data: _prev.data + (data?.choices?.[0]?.delta?.content || ''),
+          data: _prev.data + (data?.choices?.[0]?.message?.content || ''),
         }))
       },
       onError(error) {

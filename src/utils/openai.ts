@@ -1,9 +1,7 @@
 import type { User } from '@prisma/client'
-import { env } from '~/env.mjs'
 
 const HEADERS = {
   'Content-Type': 'application/json',
-  Authorization: `Bearer ${env.NEXT_PUBLIC_OPENAI_API_KEY}`,
 }
 export enum OpenaiType {
   translate = 'translate',
@@ -68,7 +66,7 @@ const OPENAI_PARAMS = {
 
 export type StreamData = {
   choices: {
-    delta: { content?: string; role?: string }
+    message: { content?: string; role?: string }
     index: number
     finish_reason: null | 'stop'
   }[]
@@ -111,10 +109,10 @@ export async function fetchSSE(
   const messages = Array.isArray(prompt)
     ? COMMON_MESSAGES.concat(prompt)
     : COMMON_MESSAGES.concat({
-      role: 'user',
-      content: prompt,
-    })
-  const response = await fetch(`${env.NEXT_PUBLIC_OPENAI_SERVER}/v1/chat/completions`, {
+        role: 'user',
+        content: prompt,
+      })
+  const response = await fetch(`./api/openai`, {
     method: 'POST',
     headers: HEADERS,
     body: JSON.stringify({
@@ -134,13 +132,16 @@ export async function fetchSSE(
     if (value) {
       buffer += new TextDecoder().decode(value)
       const lines = buffer.split('\n')
+      console.log('[faiz:] === lines', lines)
       buffer = lines.pop() || ''
       lines.forEach((line) => {
+        console.log('[faiz:] === line', line)
         const _line = line?.replace(/^data: /, '')
         try {
           const json = JSON.parse(_line) as StreamData
+          console.log('[faiz:] === json', json)
           onMessage(json)
-        } catch (err) { }
+        } catch (err) {}
       })
     }
   }
