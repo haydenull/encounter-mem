@@ -16,6 +16,7 @@ import { IconEdit, IconMenu2, IconVocabulary } from '@tabler/icons-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
+import useViewportHeight from '~/hooks/useViewportHeight'
 import { api } from '~/utils/api'
 
 interface MainLinkProps {
@@ -56,6 +57,7 @@ const Sidebar = () => {
   const { data: sessionData } = useSession()
   const [opened, { open, close }] = useDisclosure(false)
   const [topicModal, { open: openTopicModal, close: closeTopicModal }] = useDisclosure(false)
+  const viewportHeight = useViewportHeight()
 
   const { data: userInfo, refetch: refetchUserInfo } = api.vocabulary.getUserInfo.useQuery()
   const [topicValue, setTopicValue] = useState(userInfo?.topic || '')
@@ -71,16 +73,8 @@ const Sidebar = () => {
 
   return (
     <>
-      <Modal opened={topicModal} onClose={closeTopicModal} title="Set your topic">
-        <TextInput label="Topic" value={topicValue} onChange={(e) => setTopicValue(e.target.value)} />
-        <div className="mt-2 flex justify-end">
-          <Button loading={updating} onClick={onClickTopicSave}>
-            Save
-          </Button>
-        </div>
-      </Modal>
       <Drawer opened={opened} onClose={close} withCloseButton={false} size="xs">
-        <div className="h-screen flex flex-col justify-between -my-4 py-4">
+        <div className="flex flex-col justify-between -my-4 py-4" style={{ height: `${viewportHeight}px` }}>
           <div>
             <Avatar radius="xl" color={sessionData ? 'teal' : 'gray'} size="lg">
               {sessionData ? sessionData?.user?.email?.split('@')?.[0]?.[0]?.toUpperCase() : null}
@@ -118,8 +112,16 @@ const Sidebar = () => {
         </div>
       </Drawer>
       <ActionIcon onClick={open} className="m-2">
-        <IconMenu2 />
+        <IconMenu2 size="1.1rem" />
       </ActionIcon>
+      <Modal opened={topicModal} onClose={closeTopicModal} title="Set your topic" zIndex={999}>
+        <TextInput label="Topic" value={topicValue} onChange={(e) => setTopicValue(e.target.value)} />
+        <div className="mt-2 flex justify-end">
+          <Button loading={updating} onClick={onClickTopicSave}>
+            Save
+          </Button>
+        </div>
+      </Modal>
     </>
   )
 }

@@ -21,6 +21,8 @@ const server = z.object({
   // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
   EMAIL_SERVER: z.string(),
   EMAIL_FROM: z.string(),
+  OPENAI_API_KEY: z.string().min(1),
+  OPENAI_API_BASE_URL: z.string().url(),
 });
 
 /**
@@ -29,8 +31,6 @@ const server = z.object({
  */
 const client = z.object({
   // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
-  NEXT_PUBLIC_OPENAI_API_KEY: z.string().min(1),
-  NEXT_PUBLIC_OPENAI_SERVER: z.string().url(),
 });
 
 /**
@@ -47,8 +47,8 @@ const processEnv = {
   EMAIL_SERVER: process.env.EMAIL_SERVER,
   EMAIL_FROM: process.env.EMAIL_FROM,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
-  NEXT_PUBLIC_OPENAI_API_KEY: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-  NEXT_PUBLIC_OPENAI_SERVER: process.env.NEXT_PUBLIC_OPENAI_SERVER,
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  OPENAI_API_BASE_URL: process.env.OPENAI_API_BASE_URL,
 };
 
 // Don't touch the part below

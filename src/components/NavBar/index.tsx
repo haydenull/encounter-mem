@@ -6,7 +6,7 @@ const NavBar = () => {
   const router = useRouter()
 
   return (
-    <div className="h-10 flex items-center shadow-sm">
+    <div className="h-12 flex items-center shadow-sm">
       <Sidebar />
       <Title className="cursor-pointer" order={5} onClick={() => router.push('/')}>
         Encounter Mem
